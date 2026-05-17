@@ -13,4 +13,5 @@ module org.example.tareaarchivos {
 
     opens org.example.tareaarchivos to javafx.fxml;
     exports org.example.tareaarchivos;
+    exports Controlador;
 }
