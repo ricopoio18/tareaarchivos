@@ -22,6 +22,14 @@ public class Vista {
     public Button btnCargarCSV;
     public TableView<String[]> tablaCSV;
     public VBox vistaCSV;
+    public Button btnSeleccionarArchivo;
+    public Button btnGuardarArchivo;
+    public TextField campoClave;
+    public Button btnXOR;
+    public Button btnSeleccionarArchivo2;
+    public Label lblResultado;
+    public Label lblHex;
+    public Button btnDetector;
 
     public void iniciarVistaPrincipal(Stage stage) {
 
@@ -31,13 +39,16 @@ public class Vista {
         btnEditor = new Button("Editor de Notas");
         btnEstadisticas = new Button("Estadísticas de Texto");
         btnCSV = new Button("Visualizador CSV");
+        btnXOR = new Button("Encriptador XOR");
+        btnDetector = new Button("Detector de Archivos");
 
-        // 🔹 Estilo botones
         btnEditor.setPrefWidth(250);
         btnEstadisticas.setPrefWidth(250);
         btnCSV.setPrefWidth(250);
+        btnXOR.setPrefWidth(250);
+        btnDetector.setPrefWidth(250);
 
-        VBox menu = new VBox(15, btnEditor, btnEstadisticas, btnCSV);
+        VBox menu = new VBox(15, btnEditor, btnEstadisticas, btnCSV, btnXOR, btnDetector);
         menu.setAlignment(Pos.CENTER);
 
         contenedorContenido = new VBox();
@@ -117,5 +128,27 @@ public class Vista {
         btnCargarCSV = new Button("Cargar CSV");
         VBox layout = new VBox(10, btnCargarCSV, tablaCSV);
         return layout;
+    }
+
+    public VBox crearVistaXOR() {
+
+        btnSeleccionarArchivo = new Button("Seleccionar Archivo");
+        btnGuardarArchivo = new Button("Guardar Resultado");
+        campoClave = new TextField();
+        campoClave.setPromptText("Clave (número)");
+
+        return new VBox(10, btnSeleccionarArchivo, campoClave, btnGuardarArchivo);
+    }
+
+    public VBox crearVistaDetector() {
+
+        btnSeleccionarArchivo2 = new Button("Seleccionar Archivo");
+        lblHex = new Label("Hex: ");
+        lblResultado = new Label("Formato: ");
+        return new VBox(15,
+                btnSeleccionarArchivo,
+                lblHex,
+                lblResultado
+        );
     }
 }

@@ -52,6 +52,26 @@ public class Controlador {
             );
             inicializarEventosCSV();
         });
+
+        vista.btnXOR.setOnAction(e -> {
+            vista.contenedorContenido.getChildren().clear();
+            vista.contenedorContenido.getChildren().add(
+                    vista.crearVistaXOR()
+            );
+
+            inicializarEventosXOR();
+        });
+        vista.btnDetector.setOnAction(e -> {
+
+            vista.contenedorContenido.getChildren().clear();
+
+            vista.contenedorContenido.getChildren().add(
+                    vista.crearVistaDetector()
+            );
+
+            inicializarEventosDetector();
+        });
+
     }
 
     private void configurarEventoAbrirArchivoEditor() {
@@ -135,5 +155,51 @@ public class Controlador {
         configurarEventoCargarCSV();
         csvEventosAsignados = true;
     }
+    private File archivoOrigen;
 
+    private void inicializarEventosXOR() {
+
+        FileChooser fc = new FileChooser();
+        EncriptadorXOR modelo = new EncriptadorXOR();
+
+        vista.btnSeleccionarArchivo.setOnAction(e -> {
+            archivoOrigen = fc.showOpenDialog(null);
+        });
+
+        vista.btnGuardarArchivo.setOnAction(e -> {
+            if (archivoOrigen != null) {
+                File destino = fc.showSaveDialog(null);
+                if (destino != null) {
+                    try {
+                        int clave = Integer.parseInt(vista.campoClave.getText());
+
+                        modelo.procesarArchivo(archivoOrigen, destino, clave);
+
+                    } catch (NumberFormatException ex) {
+                        System.out.println("Clave inválida");
+                    }
+                }
+            }
+        });
+    }
+
+    private void inicializarEventosDetector() {
+        FileChooser fc = new FileChooser();
+        vista.btnSeleccionarArchivo.setOnAction(e -> {
+            File archivo = fc.showOpenDialog(null);
+            if (archivo != null) {
+
+                ManejoFlujosBytes modelo =
+                        new ManejoFlujosBytes(archivo.getAbsolutePath());
+
+                var bytes = modelo.leer8Bytes();
+
+                String hex = modelo.bytesAHex(bytes);
+                String formato = modelo.detectarFormatoArchivo();
+
+                vista.lblHex.setText("Hex: " + hex);
+                vista.lblResultado.setText("Formato: " + formato);
+            }
+        });
+    }
 }

@@ -96,4 +96,63 @@ public class ManejoFlujosBytes {
         if (valor == formatoJPG.get(0)) formato = "JPG";
         return formato;
     }
+
+    public String detectarFormatoArchivo() {
+
+        ArrayList<Integer> bytes = leer8Bytes();
+
+        if (bytes.size() < 4) return "Desconocido";
+
+        // PDF → 25 50 44 46
+        if (bytes.get(0) == 0x25 &&
+                bytes.get(1) == 0x50 &&
+                bytes.get(2) == 0x44 &&
+                bytes.get(3) == 0x46) {
+            return "PDF";
+        }
+
+        // JPEG → FF D8 FF
+        if (bytes.get(0) == 0xFF &&
+                bytes.get(1) == 0xD8 &&
+                bytes.get(2) == 0xFF) {
+            return "JPEG";
+        }
+
+        // PNG → 89 50 4E 47
+        if (bytes.get(0) == 0x89 &&
+                bytes.get(1) == 0x50 &&
+                bytes.get(2) == 0x4E &&
+                bytes.get(3) == 0x47) {
+            return "PNG";
+        }
+
+        // ZIP → 50 4B 03 04
+        if (bytes.get(0) == 0x50 &&
+                bytes.get(1) == 0x4B &&
+                bytes.get(2) == 0x03 &&
+                bytes.get(3) == 0x04) {
+            return "ZIP / DOCX / XLSX / JAR";
+        }
+
+        // GIF → 47 49 46 38
+        if (bytes.get(0) == 0x47 &&
+                bytes.get(1) == 0x49 &&
+                bytes.get(2) == 0x46 &&
+                bytes.get(3) == 0x38) {
+            return "GIF";
+        }
+
+        return "Formato desconocido";
+    }
+
+    public String bytesAHex(ArrayList<Integer> bytes) {
+
+        StringBuilder hex = new StringBuilder();
+
+        for (int b : bytes) {
+            hex.append(String.format("%02X ", b));
+        }
+
+        return hex.toString();
+    }
 }
