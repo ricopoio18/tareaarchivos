@@ -2,21 +2,65 @@ package Controlador;
 
 import Vista.Vista;
 import Modelo.*;
-import javafx.scene.control.TableColumn;
 import javafx.stage.FileChooser;
 import java.io.File;
 
+/**
+ * Clase Controlador
+ *
+ * Esta clase actúa como intermediario entre la Vista y los Modelos en una aplicación
+ * basada en el patrón MVC (Modelo-Vista-Controlador).
+ *
+ * Se encarga de:
+ * - Gestionar eventos de la interfaz gráfica (botones).
+ * - Coordinar la interacción entre la vista y los distintos modelos.
+ * - Controlar la carga de diferentes funcionalidades (editor, estadísticas, CSV, XOR, detector).
+ *
+ * Modelos utilizados:
+ * - EditorNotas: manejo de archivos de texto (leer/guardar).
+ * - EstadisticasTexto: cálculo de estadísticas de texto.
+ * - LectorCSV: lectura y visualización de archivos CSV.
+ * - EncriptadorXOR: encriptación/desencriptación de archivos.
+ * - ManejoFlujosBytes: análisis de archivos binarios.
+ *
+ * Vista:
+ * - Proporciona los elementos gráficos y métodos para generar las vistas.
+ *
+ * @author
+ */
 public class Controlador {
 
+    /** Referencia a la vista principal */
     private Vista vista;
+
+    /** Modelo para edición de notas */
     private EditorNotas modeloEditor;
+
+    /** Modelo para estadísticas de texto */
     private EstadisticasTexto modeloEstadisticas;
+
+    /** Modelo para lectura de archivos CSV */
     private LectorCSV modeloCSV;
+
+    /** Bandera para evitar asignar eventos CSV múltiples veces */
     private boolean csvEventosAsignados = false;
 
+    /** Archivo actualmente abierto en el editor */
     private File archivoActual;
 
-    public Controlador(Vista vista, EditorNotas editor, EstadisticasTexto estadisticas, LectorCSV modeloCSV) {
+    /**
+     * Constructor de la clase Controlador.
+     * Inicializa los modelos y configura los eventos principales de la vista.
+     *
+     * @param vista Vista principal de la aplicación
+     * @param editor Modelo de edición de notas
+     * @param estadisticas Modelo de estadísticas de texto
+     * @param modeloCSV Modelo de lectura CSV
+     */
+    public Controlador(Vista vista, EditorNotas editor,
+                       EstadisticasTexto estadisticas,
+                       LectorCSV modeloCSV) {
+
         this.vista = vista;
         this.modeloEditor = editor;
         this.modeloEstadisticas = estadisticas;
@@ -25,8 +69,11 @@ public class Controlador {
         inicializarSelectorEjercicios();
     }
 
+    /**
+     * Inicializa los botones principales de la interfaz para cambiar entre vistas.
+     */
     private void inicializarSelectorEjercicios() {
-
+        // Editor de notas
         vista.btnEditor.setOnAction(e -> {
             vista.contenedorContenido.getChildren().clear();
             vista.contenedorContenido.getChildren().add(
@@ -36,6 +83,7 @@ public class Controlador {
             configurarEventoGuardarArchivoEditor();
         });
 
+        // Estadísticas de texto
         vista.btnEstadisticas.setOnAction(e -> {
             vista.contenedorContenido.getChildren().clear();
             vista.contenedorContenido.getChildren().add(
@@ -44,8 +92,8 @@ public class Controlador {
             configurarEventoCargarTxtEstadisticas();
         });
 
+        // CSV
         vista.btnCSV.setOnAction(e -> {
-
             vista.contenedorContenido.getChildren().clear();
             vista.contenedorContenido.getChildren().add(
                     vista.crearVistaCSV()
@@ -53,27 +101,29 @@ public class Controlador {
             inicializarEventosCSV();
         });
 
+        // XOR
         vista.btnXOR.setOnAction(e -> {
             vista.contenedorContenido.getChildren().clear();
             vista.contenedorContenido.getChildren().add(
                     vista.crearVistaXOR()
             );
-
             inicializarEventosXOR();
         });
+
+        // Detector de archivos
         vista.btnDetector.setOnAction(e -> {
-
             vista.contenedorContenido.getChildren().clear();
-
             vista.contenedorContenido.getChildren().add(
                     vista.crearVistaDetector()
             );
-
             inicializarEventosDetector();
         });
-
     }
 
+    /**
+     * Configura el evento para abrir un archivo en el editor.
+     * Permite seleccionar un archivo y cargar su contenido en el área de texto.
+     */
     private void configurarEventoAbrirArchivoEditor() {
         FileChooser fileChooser = new FileChooser();
 
@@ -82,13 +132,16 @@ public class Controlador {
 
             if (archivo != null) {
                 archivoActual = archivo;
-
                 String contenido = modeloEditor.leerArchivo(archivo);
                 vista.areaTextoEditor.setText(contenido);
             }
         });
     }
 
+    /**
+     * Configura el evento para guardar un archivo desde el editor.
+     * Guarda en el archivo actual o permite elegir uno nuevo.
+     */
     private void configurarEventoGuardarArchivoEditor() {
         FileChooser fileChooser = new FileChooser();
 
@@ -109,8 +162,11 @@ public class Controlador {
         });
     }
 
+    /**
+     * Configura el evento para cargar un archivo de texto y calcular estadísticas.
+     * Muestra líneas, palabras y caracteres en una tabla.
+     */
     private void configurarEventoCargarTxtEstadisticas() {
-
         FileChooser fileChooser = new FileChooser();
 
         vista.btnCargarTxtEstadisticas.setOnAction(e -> {
@@ -133,8 +189,10 @@ public class Controlador {
         });
     }
 
+    /**
+     * Configura el evento para cargar un archivo CSV y mostrarlo en la tabla.
+     */
     private void configurarEventoCargarCSV() {
-
         FileChooser fc = new FileChooser();
 
         vista.btnCargarCSV.setOnAction(e -> {
@@ -150,13 +208,23 @@ public class Controlador {
             }
         });
     }
+
+    /**
+     * Inicializa eventos del módulo CSV evitando duplicación.
+     */
     private void inicializarEventosCSV() {
         if (csvEventosAsignados) return;
         configurarEventoCargarCSV();
         csvEventosAsignados = true;
     }
+
+    /** Archivo origen para el proceso XOR */
     private File archivoOrigen;
 
+    /**
+     * Inicializa los eventos para encriptación/desencriptación XOR.
+     * Permite seleccionar archivo, ingresar clave y guardar resultado.
+     */
     private void inicializarEventosXOR() {
 
         FileChooser fc = new FileChooser();
@@ -172,9 +240,7 @@ public class Controlador {
                 if (destino != null) {
                     try {
                         int clave = Integer.parseInt(vista.campoClave.getText());
-
                         modelo.procesarArchivo(archivoOrigen, destino, clave);
-
                     } catch (NumberFormatException ex) {
                         System.out.println("Clave inválida");
                     }
@@ -183,8 +249,13 @@ public class Controlador {
         });
     }
 
+    /**
+     * Inicializa los eventos del detector de formato de archivos.
+     * Lee los primeros bytes, los convierte a hexadecimal y detecta el tipo de archivo.
+     */
     private void inicializarEventosDetector() {
         FileChooser fc = new FileChooser();
+
         vista.btnSeleccionarArchivo.setOnAction(e -> {
             File archivo = fc.showOpenDialog(null);
             if (archivo != null) {
